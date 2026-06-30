@@ -1,0 +1,28 @@
+const CACHE_NAME = 'dictionary-cache-v1';
+const urlsToCache = [
+  './',
+  './index.html'
+];
+
+// تثبيت وحفظ الملفات في الكاش
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => {
+        return cache.addAll(urlsToCache);
+      })
+  );
+});
+
+// استدعاء الملفات من الكاش عند عدم وجود إنترنت
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    caches.match(event.request)
+      .then(response => {
+        if (response) {
+          return response; // إذا كان الملف في الكاش، افتحه فوراً
+        }
+        return fetch(event.request); // إذا لم يكن، جلب من الإنترنت
+      })
+  );
+});
